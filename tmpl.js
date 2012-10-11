@@ -22,7 +22,7 @@
                 tmpl(tmpl.load(str)) :
                     new Function(
                         tmpl.arg + ',tmpl',
-                        "var _e=tmpl.encode" + tmpl.helper + ",_s='" +
+                        "var _e=tmpl.encode" + tmpl.helper + ",_r=tmpl.raw" + tmpl.helper + ",_s='" +
                             str.replace(tmpl.regexp, tmpl.func) +
                             "';return _s;"
                     );
@@ -48,7 +48,7 @@
             if (p2 === "=") {
                 return "'+_e(" + p3 + ")+'";
             }
-            return "'+(" + p3 + "||'')+'";
+			return "'+_r(" + p3 + ")+'";
         }
         if (p4) { // evaluation start tag: {%
             return "';";
@@ -66,12 +66,15 @@
         "'"   : "&#39;"
     };
     tmpl.encode = function (s) {
-        return String(s || "").replace(
+        return String((s === 0) ? '0' : (s || "")).replace(
             tmpl.encReg,
             function (c) {
                 return tmpl.encMap[c] || "";
             }
         );
+    };
+    tmpl.raw = function (s) {
+        return String((s === 0) ? '0' : (s || ""));
     };
     tmpl.arg = "o";
     tmpl.helper = ",print=function(s,e){_s+=e&&(s||'')||_e(s);}" +
